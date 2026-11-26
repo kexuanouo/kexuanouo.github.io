@@ -1,0 +1,22 @@
+# robots.txt for kexuanouo.github.io
+#
+# 這是「使用者站點」版本：放在 kexuanouo.github.io 倉庫的根目錄。
+# 生效位置：https://kexuanouo.github.io/robots.txt
+
+User-agent: *
+Allow: /
+
+# AI 爬蟲：明確允許（你要的是被 AI 檢索到）
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://kexuanouo.github.io/sitemap.xml
