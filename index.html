@@ -395,6 +395,13 @@ section.mech h2 span{color:var(--dim)}
 #get .btn:hover{background:#FF3B4E;border-color:#FF3B4E;box-shadow:0 18px 54px -10px rgba(255,59,78,.8)}
 #get .btn span{color:#fff}
 #get .meta span{color:#C9A5A2}
+#get .sign{
+  margin-top:24px;padding-top:20px;border-top:1px solid var(--n20);
+  display:flex;gap:34px;flex-wrap:wrap;align-items:baseline;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--n50);
+}
+#get .sign b{font-weight:500;color:var(--n95);letter-spacing:.06em}
+#get .sign .sign-n{color:#C9A5A2;letter-spacing:.1em}
 .cta h2{font-size:clamp(46px,7.4vw,116px);font-weight:900;letter-spacing:-.035em;line-height:1.0;margin-bottom:48px}
 .cta .btn{
   display:inline-flex;align-items:center;gap:16px;
@@ -1470,6 +1477,10 @@ html[lang="en"] .gate .degraded{letter-spacing:0}
     <span>SUCCUBUS v15.12</span>
     <span>BLOX FRUITS · COMBAT</span>
   </div>
+  <div class="sign">
+    <span>AUTHOR <b>kexuan &amp; Zero</b></span>
+    <span class="sign-n">中文圈普遍評價 · 育成第二 · kexuan 第三</span>
+  </div>
 </section>
 
 <canvas id="bg"></canvas>
@@ -1827,6 +1838,7 @@ html[lang="en"] .gate .degraded{letter-spacing:0}
     '#get .btn span':'JOIN US NOW ↗',
     '#get .meta span:nth-child(1)':'IRUKA',
     '#get .meta span:nth-child(2)':'BY YANLI',
+    '#get .sign .sign-n':'CHINESE-SPEAKING SCENE · ZERO #2 · KEXUAN #3',
 
     /* 03 bring · evidence slider */
     '#bring .ba-top .lbl':'EVIDENCE / LIVE',
