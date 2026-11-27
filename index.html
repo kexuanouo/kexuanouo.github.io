@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
+<script>document.documentElement.className+=' js'</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IRUKA 海豚 — 厭璃 YLI｜Blox Fruits 腳本</title>
 <meta name="description" content="IRUKA（海豚）— 厭璃 YLI 開發的 Blox Fruits 戰鬥腳本。400 studs 距離、0 延遲攻擊、50 個自訂 VM opcode、六路流轉、20Hz 聚怪。免費，無付費牆。">
@@ -81,6 +82,80 @@ body{
   font-family:var(--display);
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+}
+
+/* ---------- 載入動畫 ---------- */
+html.js body.ld-lock{overflow:hidden}
+#loader{position:fixed;inset:0;z-index:99999;pointer-events:auto;cursor:default}
+#loader .ld-panel{
+  position:absolute;left:0;right:0;background:var(--n5);
+  transition:transform 1.08s cubic-bezier(.76,0,.24,1);
+}
+#loader .ld-panel.t{top:0;height:50.2%}
+#loader .ld-panel.b{bottom:0;height:50.2%}
+#loader .ld-inner{
+  position:absolute;inset:0;z-index:2;
+  display:grid;grid-template-rows:auto 1fr auto;
+  padding:32px 40px 28px;
+  transition:opacity .45s cubic-bezier(.4,0,1,1),transform .45s cubic-bezier(.4,0,1,1);
+}
+.ld-head,.ld-bottom{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;color:var(--n50);
+}
+.ld-head span:first-child{color:var(--n90);letter-spacing:.42em}
+.ld-bottom span:first-child{color:var(--n30);letter-spacing:.26em}
+.ld-skip{color:var(--n50);cursor:pointer;transition:color .3s;letter-spacing:.3em}
+.ld-skip:hover{color:var(--hot)}
+.ld-mid{align-self:end;padding-bottom:clamp(40px,14vh,168px)}
+.ld-count{
+  display:flex;align-items:flex-end;gap:12px;
+  font-family:var(--mono);color:var(--n95);line-height:.8;
+}
+.ld-count b{
+  font-weight:400;font-size:clamp(72px,11.5vw,158px);letter-spacing:-.055em;
+  font-variant-numeric:tabular-nums;
+}
+.ld-count i{font-style:normal;font-size:15px;letter-spacing:.16em;color:var(--hot);padding-bottom:18px}
+.ld-pips{display:flex;align-items:flex-end;gap:5px;margin-left:auto;padding-bottom:18px}
+.ld-pips i{
+  display:block;width:16px;height:2px;padding:0;margin:0;font-size:0;line-height:0;
+  background:var(--n20);transition:background .3s cubic-bezier(.4,0,.2,1);
+}
+.ld-pips i.on{background:var(--hot)}
+.ld-bar{height:2px;background:var(--n20);margin-top:24px;position:relative;overflow:hidden}
+.ld-bar span{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--hot)}
+.ld-foot{
+  display:flex;justify-content:space-between;margin-top:13px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.28em;color:var(--n70);
+}
+.ld-foot span:last-child{color:var(--n50);font-variant-numeric:tabular-nums}
+.ld-head,.ld-mid,.ld-bottom{animation:ldIn .95s cubic-bezier(.16,1,.3,1) both}
+.ld-mid{animation-delay:.1s}
+.ld-bottom{animation-delay:.22s}
+@keyframes ldIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+#loader.done{pointer-events:none}
+#loader.done .ld-panel.t{transform:translateY(-100%)}
+#loader.done .ld-panel.b{transform:translateY(100%)}
+#loader.done .ld-inner{opacity:0;transform:translateY(-16px)}
+#loader.gone{display:none}
+html:not(.js) #loader{animation:ldFallback .01s linear 2.4s forwards}
+@keyframes ldFallback{to{opacity:0;visibility:hidden}}
+body.shot #loader,body.seg #loader{display:none!important}
+@media(prefers-reduced-motion:reduce){
+  #loader .ld-panel,#loader .ld-inner{transition-duration:.01s}
+  .ld-head,.ld-mid,.ld-bottom{animation:none}
+}
+@media(max-width:640px){
+  #loader .ld-inner{padding:22px 20px 20px}
+  .ld-count b{font-size:clamp(58px,17vw,96px)}
+  .ld-count i{font-size:12px;padding-bottom:12px}
+  .ld-pips i{width:11px;padding:0}
+  .ld-pips{gap:4px;padding-bottom:13px}
+  .ld-mid{padding-bottom:clamp(24px,8vh,72px)}
+  .ld-bar{margin-top:18px}
+  .ld-head,.ld-bottom{font-size:8.5px;letter-spacing:.22em}
+  .ld-foot{font-size:8px;letter-spacing:.2em}
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -857,7 +932,24 @@ html[lang="en"] .gate .degraded{letter-spacing:0}
 }
 </style>
 </head>
-<body>
+<body class="ld-lock">
+
+<div id="loader">
+  <div class="ld-panel t"></div>
+  <div class="ld-panel b"></div>
+  <div class="ld-inner">
+    <div class="ld-head"><span>IRUKA</span><span>SUCCUBUS v15.12</span></div>
+    <div class="ld-mid">
+      <div class="ld-count">
+        <b id="ldNum">00</b><i>%</i>
+        <div class="ld-pips"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="ld-bar"><span id="ldFill"></span></div>
+      <div class="ld-foot"><span id="ldStage">LOADING FONTS</span><span id="ldProg">—</span></div>
+    </div>
+    <div class="ld-bottom"><span>YANLI / YLI</span><span class="ld-skip" id="ldSkip">SKIP</span></div>
+  </div>
+</div>
 
 <nav id="nav">
   <a class="nav-brand" href="#top"><span class="mark"></span><span class="txt">YLI<i>IRUKA 海豚</i></span></a>
@@ -1952,6 +2044,113 @@ html[lang="en"] .gate .degraded{letter-spacing:0}
   }else{
     demo();
   }
+})();
+</script>
+
+<script>
+/* ---------- 載入動畫 ---------- */
+(function(){
+  var ld=document.getElementById('loader');
+  if(!ld)return;
+  function bail(){
+    document.body.classList.remove('ld-lock');
+    if(ld.parentNode)ld.parentNode.removeChild(ld);
+  }
+  /* 截圖／分段模式不需要 */
+  if(location.hash==='#shot'||/[?&]y=/.test(location.search)){bail();return}
+  var seen=false;
+  try{seen=!!sessionStorage.getItem('iruka_seen_v1')}catch(e){}
+  if(seen||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){bail();return}
+
+  var num=document.getElementById('ldNum'),
+      fill=document.getElementById('ldFill'),
+      stageEl=document.getElementById('ldStage'),
+      progEl=document.getElementById('ldProg'),
+      pips=[].slice.call(ld.querySelectorAll('.ld-pips i'));
+
+  /* lazy 圖不計入，否則永遠等不到 */
+  var imgs=[].slice.call(document.images).filter(function(im){
+    return im.getAttribute('loading')!=='lazy';
+  });
+  var need=imgs.length+1;            /* +1 = 字體 */
+  var got=0,target=0,shown=0,t0=Date.now(),finished=false;
+
+  var lastS='',lastP='';
+  function refresh(){
+    /* 文字跟顯示進度一致，避免「3/3 卻只有 55%」的矛盾 */
+    var s,p,n=Math.min(got,Math.floor(shown/100*need));
+    if(shown>=99.5){s='READY';p=need+' / '+need}
+    else if(shown<24){s='LOADING FONTS';p=n+' / '+need}
+    else if(shown<84){s='LOADING ASSETS';p=n+' / '+need}
+    else{s='RENDERING';p=need+' / '+need}
+    if(s!==lastS){stageEl.textContent=s;lastS=s}
+    if(p!==lastP){progEl.textContent=p;lastP=p}
+  }
+  function bump(){
+    if(got>=need)return;
+    got++;
+    target=Math.min(100,Math.round(got/need*100));
+    refresh();
+  }
+
+  imgs.forEach(function(im){
+    if(im.complete&&im.naturalWidth>0){bump()}
+    else{
+      im.addEventListener('load',bump,{once:true});
+      im.addEventListener('error',bump,{once:true});
+    }
+  });
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(bump).catch(bump)}
+  else{bump()}
+  refresh();
+
+  /* 保險二：所有資源載入完成 */
+  window.addEventListener('load',function(){got=need;target=100;refresh()});
+  /* 保險三：4 秒兜底 */
+  setTimeout(function(){got=need;target=100;refresh()},4000);
+  /* 保險四：rAF 被節流（背景分頁／低效能）時直接收尾 */
+  setTimeout(function(){if(!finished){shown=100;num.textContent='100';fill.style.width='100%';done()}},3400);
+
+  function done(){
+    if(finished)return;
+    finished=true;
+    num.textContent='100';
+    fill.style.width='100%';
+    for(var i=0;i<pips.length;i++)pips[i].classList.add('on');
+    stageEl.textContent='READY';
+    progEl.textContent=need+' / '+need;
+    try{sessionStorage.setItem('iruka_seen_v1','1')}catch(e){}
+    setTimeout(function(){
+      ld.classList.add('done');
+      document.body.classList.remove('ld-lock');
+      setTimeout(function(){if(ld.parentNode)ld.parentNode.removeChild(ld)},1300);
+    },300);
+  }
+
+  function paint(){
+    if(finished)return;
+    var t=target;
+    /* 保底顯示時間，避免一閃而過 */
+    if(t>=100&&Date.now()-t0<1050)t=99;
+    shown+=(t-shown)*0.18;
+    if(Math.abs(t-shown)<0.35)shown=t;
+    num.textContent=('0'+Math.round(shown)).slice(-2);
+    fill.style.width=shown+'%';
+    var lit=Math.floor(shown/100*6+0.001);
+    for(var i=0;i<pips.length;i++)pips[i].classList.toggle('on',i<lit);
+    refresh();
+    if(shown>=100)done();
+    else requestAnimationFrame(paint);
+  }
+
+  function skip(){target=100;shown=100;done()}
+  ld.addEventListener('click',skip);
+  document.addEventListener('keydown',function(e){
+    if(finished)return;
+    if(e.key==='Escape'||e.key==='Enter')skip();
+  });
+
+  requestAnimationFrame(paint);
 })();
 </script>
 
