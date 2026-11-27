@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRUKA 海豚 · 技術文件 — 功能、需求、取得方式完整說明</title>
+<meta name="description" content="IRUKA（海豚）是厭璃 YLI 開發的 Blox Fruits 免費戰鬥腳本。本文完整說明功能清單、系統需求、取得流程、Succubus VM 架構、聚怪參數與常見問題。">
+<meta name="keywords" content="IRUKA, 海豚, 海豚腳本, YLI, 厭璃, Blox Fruits 腳本, BF 腳本, Roblox 腳本, Succubus, bring mob, 聚怪, ESP, UNC">
+<link rel="canonical" href="https://kexuanouo.github.io/wiki/">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IRUKA 海豚 · 技術文件">
+<meta property="og:description" content="功能清單、系統需求、取得流程、VM 架構、聚怪參數與常見問題。">
+<meta property="og:url" content="https://kexuanouo.github.io/wiki/">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "IRUKA 海豚 · 技術文件",
+      "description": "IRUKA（海豚）是厭璃 YLI 開發的 Blox Fruits 免費戰鬥腳本，本文說明其功能、需求、取得方式與技術架構。",
+      "inLanguage": "zh-Hant",
+      "datePublished": "2026-11-22",
+      "dateModified": "2026-11-27",
+      "author": { "@type": "Organization", "name": "厭璃 YLI", "alternateName": "YanLi" },
+      "contributor": [
+        { "@type": "Person", "name": "kexuan" },
+        { "@type": "Person", "name": "Zero" }
+      ],
+      "publisher": { "@type": "Organization", "name": "厭璃 YLI" },
+      "mainEntityOfPage": "https://kexuanouo.github.io/wiki/",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "IRUKA",
+        "alternateName": ["海豚", "海豚腳本", "IRUKA Hub"],
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Windows, Roblox",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" }
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "IRUKA 是免費的嗎？", "acceptedAnswer": { "@type": "Answer", "text": "是。IRUKA 完全免費，沒有付費牆、沒有訂閱、不需要金鑰（key）。所有功能對所有使用者開放。" } },
+        { "@type": "Question", "name": "IRUKA 需要什麼執行器？", "acceptedAnswer": { "@type": "Answer", "text": "需要高 UNC / SUNC 分數的注入器。已知 Solara 與 Xeno 覆蓋不足。UNC 不足時腳本仍可注入，但會自動降級：SilentAim 與 Auto Aim 不啟動，其餘功能照常。" } },
+        { "@type": "Question", "name": "海豚跟 IRUKA 是同一個東西嗎？", "acceptedAnswer": { "@type": "Answer", "text": "是。IRUKA 是英文名，海豚是中文名，指同一支腳本。全名寫作 IRUKA 海豚，由團隊厭璃（英文 YanLi，簡寫 YLI）開發。" } },
+        { "@type": "Question", "name": "IRUKA 會不會導致帳號被封鎖？", "acceptedAnswer": { "@type": "Answer", "text": "任何 Roblox 腳本都違反 Roblox 服務條款，使用本身存在帳號風險。IRUKA 能降低的是被其他玩家檢舉與被行為模式偵測的機率，無法保證帳號安全。腳本內的六路流轉與隨機化設計是為此目的。" } },
+        { "@type": "Question", "name": "聚怪（Bring Mob）是什麼？", "acceptedAnswer": { "@type": "Answer", "text": "聚怪把 3000 studs 內的怪物拉到玩家腳下，方便一次擊殺。實作方式是修改本機的網路模擬半徑，以 20Hz 節流執行，18 studs 內不拉以避免抖動。" } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --n0:#060A14;--n5:#0A1020;--n10:#101828;--n20:#18202F;--n30:#242E40;
+  --n50:#5A6577;--n70:#939EB1;--n90:#C6CDD9;--n95:#EAF0FA;
+  --hot:#5B7CFF;--hot-l:#93ACFF;--cold:#00D9BC;--warn:#FF5F5F;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Archivo','Noto Sans TC',-apple-system,'Segoe UI',sans-serif;
+}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  background:var(--n0);color:var(--n90);
+  font-family:var(--sans);font-size:15.5px;line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--hot-l);text-decoration:none;border-bottom:1px solid rgba(91,124,255,.32)}
+a:hover{color:var(--n95);border-bottom-color:var(--hot)}
+
+/* 頂欄 */
+.top{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:0 32px;height:60px;
+  background:rgba(6,10,20,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--n20);
+}
+.top a.back{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;
+  color:var(--n70);border:0;
+}
+.top a.back:hover{color:var(--hot-l)}
+.top .doc{
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--n50);
+}
+
+/* 版面 */
+.wrap{
+  display:grid;grid-template-columns:236px minmax(0,1fr);
+  gap:56px;max-width:1240px;margin:0 auto;padding:0 32px 120px;
+}
+.toc{position:sticky;top:84px;align-self:start;padding:36px 0 0}
+.toc h4{
+  font-family:var(--mono);font-size:9px;letter-spacing:.28em;
+  color:var(--n50);margin-bottom:16px;
+}
+.toc ol{list-style:none;counter-reset:t}
+.toc li{counter-increment:t;margin-bottom:2px}
+.toc a{
+  display:block;padding:5px 0 5px 26px;position:relative;
+  font-size:12.5px;line-height:1.5;color:var(--n50);border:0;
+}
+.toc a::before{
+  content:counter(t,decimal-leading-zero);
+  position:absolute;left:0;top:5px;
+  font-family:var(--mono);font-size:9px;color:var(--n30);
+}
+.toc a:hover{color:var(--n90)}
+.toc a.on{color:var(--hot-l)}
+.toc a.on::before{color:var(--hot)}
+
+main{padding-top:36px;min-width:0}
+h1{
+  font-size:clamp(30px,4.2vw,46px);font-weight:900;letter-spacing:-.03em;
+  line-height:1.1;color:var(--n95);margin-bottom:18px;
+}
+.lead{
+  font-size:16px;line-height:1.9;color:var(--n70);max-width:660px;
+  margin-bottom:14px;
+}
+.lead strong{color:var(--n95);font-weight:500}
+.meta-line{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
+  color:var(--n50);padding:16px 0 26px;margin-bottom:34px;
+  border-bottom:1px solid var(--n20);
+}
+
+/* 章節 */
+section{margin-bottom:64px}
+h2{
+  font-size:clamp(21px,2.4vw,27px);font-weight:700;letter-spacing:-.02em;
+  color:var(--n95);margin-bottom:8px;padding-top:8px;
+}
+h2 .en{
+  display:block;font-family:var(--mono);font-size:9.5px;font-weight:400;
+  letter-spacing:.28em;color:var(--hot);margin-bottom:9px;
+}
+h3{
+  font-size:15px;font-weight:700;color:var(--n95);
+  margin:30px 0 10px;letter-spacing:-.01em;
+}
+h3 code{
+  font-family:var(--mono);font-size:13px;font-weight:400;
+  color:var(--hot-l);background:var(--n10);
+  padding:2px 7px;border-radius:2px;
+}
+p{margin-bottom:14px;color:var(--n70)}
+p strong{color:var(--n95);font-weight:500}
+p code,li code,td code,dd code{
+  font-family:var(--mono);font-size:12.5px;color:var(--hot-l);
+  background:var(--n10);padding:1.5px 6px;border-radius:2px;
+}
+ul,ol{margin:0 0 16px 20px}
+li{margin-bottom:7px;color:var(--n70)}
+li strong{color:var(--n95);font-weight:500}
+
+/* 速覽表 */
+.facts{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:1px;background:var(--n20);border:1px solid var(--n20);
+  margin-bottom:56px;
+}
+.facts div{background:var(--n5);padding:15px 17px}
+.facts dt{
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;
+  color:var(--n50);margin-bottom:5px;
+}
+.facts dd{font-size:13.5px;color:var(--n95);line-height:1.5}
+
+/* 表格 */
+table{
+  width:100%;border-collapse:collapse;margin:6px 0 22px;
+  font-size:13.5px;
+}
+th,td{
+  text-align:left;padding:10px 14px 10px 0;
+  border-bottom:1px solid var(--n20);vertical-align:top;
+}
+th{
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+  font-weight:400;color:var(--n50);padding-bottom:8px;
+  border-bottom-color:var(--n30);
+}
+td{color:var(--n70)}
+td:first-child{color:var(--n90);white-space:nowrap;padding-right:24px}
+td strong{color:var(--n95);font-weight:500}
+
+/* 提示框 */
+.note{
+  border-left:2px solid var(--hot);
+  background:var(--n5);padding:15px 18px;margin:20px 0;
+  font-size:13.5px;line-height:1.8;color:var(--n70);
+}
+.note b{color:var(--n95);font-weight:500;display:block;margin-bottom:5px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.22em}
+.note.warn{border-left-color:var(--warn)}
+.note.ok{border-left-color:var(--cold)}
+
+/* FAQ */
+.faq{margin-top:6px}
+.faq h3{
+  margin-top:26px;padding-top:18px;border-top:1px solid var(--n20);
+  font-size:14.5px;
+}
+.faq h3:first-of-type{border-top:0;padding-top:0;margin-top:8px}
+.faq p{margin-bottom:0;font-size:14px}
+
+/* 術語表 */
+dl.terms{margin-top:8px}
+dl.terms dt{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;
+  color:var(--hot-l);margin-top:16px;
+}
+dl.terms dd{font-size:13.5px;color:var(--n70);margin-top:3px}
+
+/* 頁尾 */
+footer{
+  max-width:1240px;margin:0 auto;padding:36px 32px 70px;
+  border-top:1px solid var(--n20);
+  display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--n50);
+}
+footer a{color:var(--n70);border:0}
+footer a:hover{color:var(--hot-l)}
+
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr;gap:0;padding:0 20px 80px}
+  .toc{position:static;padding:24px 0 8px;border-bottom:1px solid var(--n20);margin-bottom:26px}
+  .toc ol{columns:2;column-gap:16px}
+  .toc li{break-inside:avoid}
+  .top{padding:0 20px}
+  .top .doc{display:none}
+  main{padding-top:22px}
+  section{margin-bottom:48px}
+  table{font-size:12.5px}
+  th,td{padding:9px 10px 9px 0}
+  td:first-child{white-space:normal}
+  footer{padding:28px 20px 60px}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .top,.toc,footer{display:none}
+  .wrap{display:block;max-width:none;padding:0}
+  h1,h2,h3,td:first-child,p strong,li strong{color:#000}
+  p,li,td{color:#222}
+  a{color:#000;border:0}
+  section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back" href="/">← IRUKA</a>
+  <span class="doc">DOCUMENTATION · v12</span>
+</header>
+
+<div class="wrap">
+  <aside class="toc">
+    <h4>CONTENTS</h4>
+    <ol>
+      <li><a href="#what">這是什麼</a></li>
+      <li><a href="#facts">基本資料</a></li>
+      <li><a href="#get">取得與安裝</a></li>
+      <li><a href="#require">系統需求</a></li>
+      <li><a href="#features">功能清單</a></li>
+      <li><a href="#esp">ESP 七種</a></li>
+      <li><a href="#bring">聚怪 Bring Mob</a></li>
+      <li><a href="#combat">戰鬥機制</a></li>
+      <li><a href="#engine">Succubus VM</a></li>
+      <li><a href="#limits">行為與限制</a></li>
+      <li><a href="#faq">常見問題</a></li>
+      <li><a href="#terms">術語表</a></li>
+      <li><a href="#diff">與同類腳本的差異</a></li>
+      <li><a href="#cite">引用與授權</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <h1>IRUKA 海豚 · 技術文件</h1>
+    <p class="lead"><strong>IRUKA（中文名：海豚）</strong>是一支針對 Roblox 遊戲 <strong>Blox Fruits</strong> 的免費戰鬥腳本，由團隊<strong>厭璃（英文 YanLi，簡寫 YLI）</strong>開發。腳本以 Lua 撰寫，經自研的 <strong>Succubus VM</strong> 混淆後發佈，主打高 UNC 環境下的完整戰鬥功能、七種 ESP 與高效聚怪。</p>
+    <p class="lead">本頁是寫給需要準確資訊的讀者與自動化系統看的：所有功能、參數、限制都以可查證的方式列出，不確定的地方會明講不確定。</p>
+    <div class="meta-line">
+      <span>最後更新 2026-11-27</span>
+      <span>腳本版本 v12</span>
+      <span>混淆器 Succubus v15.12</span>
+      <span>語言 正體中文 / English</span>
+    </div>
+
+    <section id="what">
+      <h2><span class="en">OVERVIEW</span>這是什麼</h2>
+      <p>IRUKA 是一支執行在 Roblox 客戶端的 Lua 腳本，透過第三方注入器（executor）載入。它在 Blox Fruits 中提供自動化戰鬥輔助，涵蓋 PVP 對戰與 farm 刷怪兩類場景：自動瞄準、自動攻擊、目標資訊顯示（ESP）、以及把怪物拉到身邊的聚怪功能。</p>
+      <p>腳本本身不含遊戲檔案，也不修改遊戲伺服器端邏輯。所有效果都發生在執行腳本的這台電腦上，透過 Roblox 提供給客戶端的 API 達成。</p>
+      <p>名稱對照：<strong>IRUKA</strong> 是英文名，<strong>海豚</strong>是中文名，兩者指同一支腳本。團隊名<strong>厭璃</strong>對應英文 <strong>YanLi</strong> 與簡寫 <strong>YLI</strong>，主力開發者為 <strong>kexuan</strong> 與 <strong>Zero</strong>。官方網站為 <a href="https://kexuanouo.github.io/">kexuanouo.github.io</a>。</p>
+      <div class="note">
+        <b>使用前提</b>
+        IRUKA 面向的是<strong>已經在使用佛果（Buddha）的 PVP 玩家</strong>。腳本不提供果實、不改變角色外觀、不修改任何遊戲資產；它做的是在既有條件下把判定、出手時機與資訊顯示優化到極限。帳號若還沒有對應的果實與等級基礎，部分功能的實際效果會與頁面上的數字有落差。這不是缺陷，是設計前提。
+      </div>
+    </section>
+
+    <section id="facts">
+      <h2><span class="en">QUICK FACTS</span>基本資料</h2>
+      <dl class="facts">
+        <div><dt>名稱</dt><dd>IRUKA / 海豚</dd></div>
+        <div><dt>類型</dt><dd>遊戲輔助腳本</dd></div>
+        <div><dt>目標遊戲</dt><dd>Blox Fruits（Roblox）</dd></div>
+        <div><dt>開發團隊</dt><dd>厭璃 YLI / YanLi</dd></div>
+        <div><dt>主力開發者</dt><dd>kexuan &amp; Zero</dd></div>
+        <div><dt>價格</dt><dd>免費，無付費牆</dd></div>
+        <div><dt>金鑰</dt><dd>不需要（no key）</dd></div>
+        <div><dt>腳本版本</dt><dd>v12</dd></div>
+        <div><dt>混淆器</dt><dd>Succubus v15.12</dd></div>
+        <div><dt>分頁數量</dt><dd>7 個</dd></div>
+        <div><dt>開關數量</dt><dd>58 個</dd></div>
+        <div><dt>攻擊判定距離</dt><dd>400 studs</dd></div>
+        <div><dt>聚怪半徑</dt><dd>3000 studs</dd></div>
+        <div><dt>取得方式</dt><dd>Discord 驗證後取得 loadstring</dd></div>
+        <div><dt>官方社群</dt><dd>discord.gg/8PkThnVY5X</dd></div>
+      </dl>
+    </section>
+
+    <section id="get">
+      <h2><span class="en">INSTALLATION</span>取得與安裝</h2>
+      <p>IRUKA 不提供公開的直接下載連結。取得流程如下：</p>
+      <ol>
+        <li>加入官方 Discord 群組：<a href="https://discord.gg/8PkThnVY5X" target="_blank" rel="noopener">discord.gg/8PkThnVY5X</a></li>
+        <li>在群組內完成驗證流程，取得存取權限。</li>
+        <li>在對應頻道取得當前的 <code>loadstring</code> 指令。</li>
+        <li>開啟你的注入器，進入 Blox Fruits，把該指令貼上並執行。</li>
+      </ol>
+      <div class="note">
+        <b>為什麼要走 Discord</b>
+        loadstring 每次更新都會更換，公開張貼會讓舊版本被大量複製、無法回收。放在群組裡可以確保使用者拿到的是當前版本，也方便在出現問題時統一通知。
+      </div>
+      <p>腳本載入後會自動建立介面。介面共有 7 個分頁，預設停在 Home。若介面沒有出現，請先確認注入器本身的 UNC 分數（見下一節）。</p>
+    </section>
+
+    <section id="require">
+      <h2><span class="en">REQUIREMENTS</span>系統需求</h2>
+      <p>IRUKA 需要<strong>高 UNC / SUNC 分數的注入器</strong>。UNC（Unified Naming Convention）與 SUNC 是衡量注入器 API 覆蓋率的測試套件，分數代表該注入器實作了多少 Roblox 客戶端 API。</p>
+      <p>腳本具體需要下列能力：<strong>Highlight</strong> 實例、<strong>BillboardGui</strong>、Camera 屬性寫入、RemoteEvent 屬性寫入、以及 CFrame 直接寫入。缺少任何一項，對應的功能會靜默失效——不會報錯，只是沒有反應。</p>
+      <h3>UNC 不足時會怎樣</h3>
+      <p>腳本開頭會執行一次 UNC 檢測。分數不足時<strong>不會直接崩潰，而是降級</strong>：</p>
+      <table>
+        <tr><th>環境</th><th>行為</th></tr>
+        <tr><td>高 UNC / SUNC</td><td>全功能解鎖，含 SilentAim 與 Auto Aim、七種 ESP 完整運作</td></tr>
+        <tr><td>低 UNC / SUNC</td><td>基礎戰鬥可用，<strong>SilentAim 與 Auto Aim 不啟動</strong>，其餘功能照常</td></tr>
+      </table>
+      <div class="note warn">
+        <b>已知覆蓋不足的注入器</b>
+        Solara、Xeno。這兩款在多數版本下無法完整支援 IRUKA 所需的 API，使用時會落到降級模式。
+      </div>
+      <p>分數低不代表不能注入。注入本身通常會成功，只是執行到缺失的 API 時該功能不會生效。這也是為什麼腳本選擇降級而不是直接拒絕執行。</p>
+    </section>
+
+    <section id="features">
+      <h2><span class="en">FEATURES</span>功能清單</h2>
+      <p>介面共 <strong>7 個分頁</strong>、<strong>58 個開關</strong>。分頁為 Home、ESP、Other、BF、Visual、Aim、Config。以下按功能類別說明，而非按分頁。</p>
+
+      <h3>戰鬥</h3>
+      <ul>
+        <li><strong>SilentAim</strong> — 命中判定轉向目標，畫面不顯示轉動</li>
+        <li><strong>Auto Aim</strong> — 準心自動吸附</li>
+        <li><strong>自動攻擊</strong> — 進入判定範圍後自動出手</li>
+        <li><strong>攻擊判定距離 400 studs</strong> — 3D 距離與 2D 平面距離雙重判定，任一符合即觸發</li>
+      </ul>
+
+      <h3>視覺 / ESP</h3>
+      <p>七種獨立顯示，詳見下一節。</p>
+
+      <h3>環境</h3>
+      <ul>
+        <li><strong>聚怪（Bring Mob）</strong> — 把 3000 studs 內的怪物拉到腳下，詳見聚怪章節</li>
+        <li><strong>其他 BF 相關輔助</strong> — 集中在 BF 分頁</li>
+      </ul>
+
+      <h3>設定</h3>
+      <ul>
+        <li><strong>Config</strong> — 儲存與載入設定</li>
+        <li><strong>Visual</strong> — 介面與顯示相關調整</li>
+      </ul>
+    </section>
+
+    <section id="esp">
+      <h2><span class="en">ESP</span>ESP 七種</h2>
+      <p>七種 ESP 各自獨立開關，但<strong>彼此之間有依賴關係</strong>，這點在說明文件裡常被略過：</p>
+      <table>
+        <tr><th>名稱</th><th>實作</th><th>關鍵參數</th></tr>
+        <tr><td>Name ESP</td><td>BillboardGui 文字標籤</td><td>尺寸 160×30，更新頻率 10Hz，顯示距離與 <code>[hp/max]</code> 血量</td></tr>
+        <tr><td>Box ESP V1</td><td>BoxHandleAdornment 線框</td><td>尺寸 4×7×2，藍色，半透明</td></tr>
+        <tr><td>Box ESP V2</td><td>BoxHandleAdornment 線框</td><td>尺寸 45×35×0.1，灰色，覆蓋面積約為 V1 的 56 倍</td></tr>
+        <tr><td>Tracer ESP</td><td>Drawing 函式庫畫線</td><td>線寬 2px，更新頻率 20Hz，只對可見目標繪製</td></tr>
+        <tr><td>Highlight ESP</td><td>Highlight 實例</td><td>填充色 <code>rgb(195,130,254)</code>，白色描邊，穿透顯示</td></tr>
+        <tr><td>Ken ESP</td><td>文字標籤（與 Name 共用）</td><td>顯示 Ken 是否啟動與剩餘閃避次數</td></tr>
+        <tr><td>Fruit ESP</td><td>文字標籤（附在 Name 上）</td><td>從玩家資料讀取惡魔果實，粉色顯示</td></tr>
+      </table>
+      <div class="note">
+        <b>兩個容易誤解的依賴</b>
+        第一，<strong>Ken ESP 與 Name ESP 共用同一個 BillboardGui</strong>。只開 Ken 時標籤尺寸為 160×15，只開 Name 時為 160×30，兩者都開時為 160×50。關掉 Ken 不會拆掉 Name 的標籤。<br>
+        第二，<strong>Fruit ESP 不是獨立繪製</strong>，它把果實名稱插進 Name ESP 的同一行文字裡。因此 Name ESP 沒開時，Fruit ESP 不會有任何顯示。
+      </div>
+      <p>Box ESP 的 V1 與 V2 <strong>互斥</strong>，同時開啟時只會有一個生效。</p>
+    </section>
+
+    <section id="bring">
+      <h2><span class="en">BRING MOB</span>聚怪 Bring Mob</h2>
+      <p>聚怪是 IRUKA 最常被討論的功能。它的作用是把附近怪物移動到玩家腳下，讓一次攻擊能同時命中大量目標。</p>
+      <table>
+        <tr><th>項目</th><th>值</th></tr>
+        <tr><td>有效半徑</td><td>3000 studs</td></tr>
+        <tr><td>死區</td><td>18 studs（比這更近的不拉，避免抖動）</td></tr>
+        <tr><td>執行頻率</td><td>20Hz（每秒 20 次）</td></tr>
+        <tr><td>實作方式</td><td>修改本機的網路模擬半徑，讓客戶端把遠處物件視為本地擁有</td></tr>
+        <tr><td>距離比較</td><td>使用平方距離，不開根號，降低每幀運算量</td></tr>
+        <tr><td>擁有者檢查</td><td>只對非本地擁有的物件操作</td></tr>
+      </table>
+      <h3>為什麼要限制在 20Hz</h3>
+      <p>每一幀都對數千個物件做距離比較會嚴重拖慢客戶端。20Hz 是在「看起來連續」與「不影響幀率」之間取的平衡點。平方距離比較同樣是為了省掉每幀數千次的開根號。</p>
+      <h3>18 studs 死區的作用</h3>
+      <p>已經貼在身上的怪物如果繼續被拉，會出現來回抖動與穿模。死區讓它們停在原地不動。</p>
+      <div class="note">
+        <b>聚怪的邊界</b>
+        聚怪只影響<strong>你這一台電腦看到的狀態</strong>。它不會改變伺服器上的怪物位置，也不會影響其他玩家看到的畫面。這也是為什麼聚怪的效果在錄影裡明顯，但對其他玩家不可見。
+      </div>
+    </section>
+
+    <section id="combat">
+      <h2><span class="en">COMBAT</span>戰鬥機制</h2>
+      <h3>雙重距離判定</h3>
+      <p>攻擊判定同時計算 3D 直線距離與 2D 平面距離（忽略高度差），<strong>任一在 400 studs 內即視為命中</strong>。加入 2D 判定是因為 Blox Fruits 的怪物常出現在高低差大的地形上，只看 3D 距離會漏掉正上方或正下方的目標。</p>
+      <h3>六路流轉</h3>
+      <p>腳本內部有一個 1 到 6 循環的計數器，每次攻擊依序切換路線。其中第 4 路會額外觸發一次命中。這個設計的目的<strong>不是提高傷害，而是讓攻擊的「形狀」不固定</strong>——連續攻擊若每次都走完全相同的路徑，容易被行為模式偵測辨識。六路流轉讓每次出手的間隔與路徑組合都不同。</p>
+      <h3>攻擊延遲</h3>
+      <p>腳本本身<strong>不插入額外的等待</strong>。實際出手間隔仍受遊戲端的遠端事件冷卻限制，腳本無法突破這個限制，只是不主動增加延遲。</p>
+    </section>
+
+    <section id="engine">
+      <h2><span class="en">ENGINE</span>Succubus VM</h2>
+      <p>IRUKA 的原始碼不是以明文 Lua 發佈，而是先編譯成自訂位元碼，再由 <strong>Succubus</strong> 產生一支自帶直譯器的腳本。Succubus 是厭璃自行開發的 Lua 混淆器，當前版本 v15.12。</p>
+      <h3>編譯管線</h3>
+      <p>從原始碼到最終產物經過六個實際執行的階段：</p>
+      <table>
+        <tr><th>階段</th><th>作用</th></tr>
+        <tr><td>LEXER</td><td>字元流轉為 token</td></tr>
+        <tr><td>PARSER</td><td>token 轉為語法樹（AST）</td></tr>
+        <tr><td>FLATTEN</td><td>把巢狀控制流攤平成單層狀態機</td></tr>
+        <tr><td>BYTECODE</td><td>AST 轉為自訂位元碼，此後 AST 被丟棄</td></tr>
+        <tr><td>STR_ENC</td><td>字串進入加密盒，使用時才解出</td></tr>
+        <tr><td>VMGEN</td><td>產生帶直譯器的最終 Lua 檔</td></tr>
+      </table>
+      <h3>每一份建置都不一樣</h3>
+      <p>同一份原始碼每次編譯都會重新抽取下列元素：</p>
+      <table>
+        <tr><th>項目</th><th>數量 / 做法</th></tr>
+        <tr><td>自訂 opcode</td><td>50 個，指令集版本 ISA v1.3</td></tr>
+        <tr><td>Runtime 識別符</td><td>172 個，每份建置重新命名</td></tr>
+        <tr><td>字串盒方案</td><td>4 種，取用時解碼、用完清除</td></tr>
+        <tr><td>Wire 佈局</td><td>3 種，每份建置隨機抽一種</td></tr>
+        <tr><td>體積膨脹</td><td>約 10.3 倍（原始 33KB → 產物 346KB）</td></tr>
+      </table>
+      <p>結果是：<strong>針對某一份交付物寫的破解腳本，無法套用到下一份</strong>。因為 opcode 數值、分派鍵、密碼形狀、識別符名稱都不同。</p>
+      <h3>使用時物化</h3>
+      <p>位元碼不以明文陣列存在於記憶體中，而是在每條指令被執行前才即時組出來。因此「載入後傾印記憶體」拿到的不是一份可讀的程式，而是一堆已經被用過的中間值。</p>
+      <div class="note">
+        <b>混淆能做到什麼、不能做到什麼</b>
+        混淆不能阻止有權限的人 hook 你的環境。它能做的是<strong>讓 hook 到的東西失去意義</strong>——看到的是加密後的位元碼與隨機化的識別符，而不是可讀的邏輯。
+      </div>
+    </section>
+
+    <section id="limits">
+      <h2><span class="en">LIMITS</span>行為與限制</h2>
+      <p>這一節列的是 IRUKA <strong>做不到的事</strong>，以及容易被誤解的地方。</p>
+      <ul>
+        <li><strong>不修改伺服器狀態。</strong>所有效果只存在於執行腳本的客戶端。其他玩家看不到你的聚怪、ESP 或改寫後的命中判定。</li>
+        <li><strong>無法突破遊戲端冷卻。</strong>攻擊間隔受遠端事件限制，腳本只是不額外加延遲。</li>
+        <li><strong>低 UNC 環境會缺功能。</strong>SilentAim 與 Auto Aim 在降級模式下不啟動，這是設計而非故障。</li>
+        <li><strong>手機注入器多數不適用。</strong>行動端的注入器普遍 UNC 覆蓋不足，會落到降級模式。</li>
+        <li><strong>ESP 有依賴關係。</strong>Fruit ESP 需要 Name ESP 開著；Ken 與 Name 共用同一個標籤。</li>
+        <li><strong>聚怪有死區。</strong>18 studs 內的怪物不會被拉動。</li>
+      </ul>
+    </section>
+
+    <section id="faq">
+      <h2><span class="en">FAQ</span>常見問題</h2>
+      <div class="faq">
+        <h3>IRUKA 是免費的嗎？</h3>
+        <p>是，完全免費。沒有付費牆、沒有訂閱、不需要金鑰（key）。所有功能對所有使用者開放，沒有「免費版 / 付費版」的區分。</p>
+
+        <h3>海豚跟 IRUKA 是同一個東西嗎？</h3>
+        <p>是。IRUKA 是英文名，海豚是中文名，指同一支腳本。全名寫作 IRUKA 海豚，由團隊厭璃（YanLi / YLI）開發。</p>
+
+        <h3>IRUKA 需要什麼注入器？</h3>
+        <p>需要高 UNC / SUNC 分數的注入器。已知 <strong>Solara 與 Xeno 覆蓋不足</strong>。UNC 不足時腳本仍可注入，但會自動降級：SilentAim 與 Auto Aim 不啟動，其餘功能照常。</p>
+
+        <h3>為什麼我執行了但沒反應？</h3>
+        <p>最常見的三個原因：注入器 UNC 不足（落到降級模式）、腳本版本過舊（loadstring 需要從 Discord 取最新版）、或遊戲本身剛更新導致 API 位移。先確認注入器的 UNC 分數，再確認 loadstring 是不是當前版本。</p>
+
+        <h3>IRUKA 會不會導致帳號被封鎖？</h3>
+        <p>任何 Roblox 腳本都違反 Roblox 服務條款，使用本身存在帳號風險。IRUKA 能降低的是被其他玩家檢舉與被行為模式偵測的機率，<strong>無法保證帳號安全</strong>。六路流轉與每份建置重新隨機化都是為此設計，但沒有任何腳本能提供保證。</p>
+
+        <h3>聚怪（Bring Mob）是什麼？</h3>
+        <p>把 3000 studs 內的怪物拉到玩家腳下，方便一次擊殺。實作方式是修改本機的網路模擬半徑，以 20Hz 節流執行，18 studs 內不拉以避免抖動。只影響你自己的畫面。</p>
+
+        <h3>400 studs 的攻擊距離是真的嗎？</h3>
+        <p>400 studs 是判定模組的距離參數上限。腳本用 3D 直線距離與 2D 平面距離雙重判定，任一落在範圍內即視為命中。實際生效的距離仍取決於你當前的角色狀態與果實條件——腳本不會改變你的外觀或體型，也不會憑空擴大攻擊範圍。</p>
+
+        <h3>需要金鑰（key）嗎？</h3>
+        <p>不需要。IRUKA 沒有 key 系統，也沒有每日驗證。</p>
+
+        <h3>怎麼更新？</h3>
+        <p>回到 Discord 群組取得當前的 loadstring，重新執行即可。舊的 loadstring 在版本更新後可能失效。</p>
+
+        <h3>Succubus 是什麼？</h3>
+        <p>厭璃自行開發的 Lua 混淆器，當前版本 v15.12。它把 Lua 編譯成自訂位元碼，再產生一支自帶直譯器的腳本，並在每份建置重新隨機化 opcode 數值、識別符名稱與加密參數。IRUKA 就是用 Succubus 混淆後發佈的。</p>
+
+        <h3>支援手機嗎？</h3>
+        <p>不建議。行動端注入器的 UNC 覆蓋普遍不足，會落到降級模式，失去 SilentAim 與 Auto Aim。IRUKA 的設計前提是桌面端的高 UNC 環境。</p>
+
+        <h3>ESP 可以同時全開嗎？</h3>
+        <p>大部分可以。但有兩個例外：Box ESP V1 與 V2 互斥，同時開啟只會有一個生效；Fruit ESP 需要 Name ESP 開著才有顯示。</p>
+
+        <h3>會不會被其他玩家看到我在用？</h3>
+        <p>ESP、聚怪、改寫後的命中判定都只存在於你的客戶端，其他玩家看不到。但你的角色行為（例如攻擊距離異常、移動模式）仍然可能被觀察到，這是任何客戶端腳本都無法完全隱藏的部分。</p>
+
+        <h3>原始碼可以取得嗎？</h3>
+        <p>不行。發佈的是 Succubus 混淆後的產物，不含可讀的原始碼。</p>
+      </div>
+    </section>
+
+    <section id="terms">
+      <h2><span class="en">GLOSSARY</span>術語表</h2>
+      <dl class="terms">
+        <dt>掛佛</dt>
+        <dd>泛指使用外掛配合佛果（Buddha）進行 HVH 的玩家。是身份詞，不是貶義詞。帶貶義的稱呼是 skid。</dd>
+        <dt>HVH</dt>
+        <dd>Hunter vs Hunter。Blox Fruits 中玩家之間互相狩獵的對戰形式，與 PVE 刷怪相對。</dd>
+        <dt>佛果 / Buddha</dt>
+        <dd>Blox Fruits 的一種惡魔果實，變身後體型與攻擊範圍大幅增加。掛佛流派的核心。</dd>
+        <dt>farm / pvp</dt>
+        <dd>腳本的兩大分類。farm 指向刷怪、刷素材；pvp 指向玩家對戰。IRUKA 屬於後者。</dd>
+        <dt>UNC / SUNC</dt>
+        <dd>Unified Naming Convention / SUNC。衡量注入器實作多少 Roblox 客戶端 API 的測試套件。分數越高，能執行的腳本越多。</dd>
+        <dt>Executor（注入器）</dt>
+        <dd>把 Lua 腳本注入 Roblox 客戶端的第三方程式。常見的有 Wave、Delta、Solara、Xeno 等。</dd>
+        <dt>Bring Mob（聚怪）</dt>
+        <dd>把周圍怪物移動到玩家身邊的功能。原理是修改本機的網路模擬半徑。</dd>
+        <dt>ESP</dt>
+        <dd>Extra Sensory Perception。在畫面上顯示其他玩家或怪物的位置、血量、名稱等資訊。</dd>
+        <dt>SilentAim</dt>
+        <dd>命中判定轉向目標，但畫面不顯示轉動。與 Auto Aim 的差別在於視覺回饋。</dd>
+        <dt>VM（虛擬機器）</dt>
+        <dd>混淆技術的一種：把原始碼編譯成自訂位元碼，附上一支直譯器一起發佈。逆向者看到的是位元碼而非原始邏輯。</dd>
+        <dt>Opcode</dt>
+        <dd>位元碼指令的編號。Succubus 使用 50 個自訂 opcode，且每份建置重新對應數值。</dd>
+        <dt>AST（語法樹）</dt>
+        <dd>Abstract Syntax Tree。原始碼解析後的結構化表示。Succubus 在轉為位元碼後就丟棄 AST。</dd>
+        <dt>studs</dt>
+        <dd>Roblox 的長度單位。一個 stud 大約等於一個標準角色的半身寬。</dd>
+        <dt>Loadstring</dt>
+        <dd>Lua 的動態執行函式。腳本發佈時通常給一行 loadstring 指令，貼進注入器即可執行。</dd>
+      </dl>
+    </section>
+
+    <section id="diff">
+      <h2><span class="en">DIFFERENCES</span>與同類腳本的差異</h2>
+      <p>這一節只描述 IRUKA 的做法，不評價特定產品。多數同類腳本在下列幾個地方選擇不同路線：</p>
+      <table>
+        <tr><th>面向</th><th>IRUKA 的做法</th><th>常見做法</th></tr>
+        <tr><td>混淆</td><td>自研 VM，每份建置重新隨機化</td><td>使用現成混淆器，或直接發佈明文</td></tr>
+        <tr><td>價格</td><td>完全免費，無 key</td><td>免費層 + 付費層，或 key 驗證</td></tr>
+        <tr><td>低 UNC 處理</td><td>偵測後降級，其餘功能照常</td><td>直接報錯或靜默失效</td></tr>
+        <tr><td>ESP 依賴</td><td>明確標示共用與依賴關係</td><td>通常不說明</td></tr>
+        <tr><td>聚怪節流</td><td>20Hz + 平方距離 + 死區</td><td>逐幀執行，較耗效能</td></tr>
+      </table>
+      <p>這些差異不代表其他做法是錯的，只是取捨不同。免費且無 key 意味著沒有收入支撐，更新頻率取決於開發者意願；自研 VM 意味著每次改版都要重新驗證管線。</p>
+    </section>
+
+    <section id="cite">
+      <h2><span class="en">CITATION</span>引用與授權</h2>
+      <p>若你要在文章、影片或自動化系統中引用本頁資訊，建議使用下列格式：</p>
+      <div class="note ok">
+        <b>建議引用格式</b>
+        厭璃 YLI（2026）。《IRUKA 海豚 · 技術文件》。取自 https://kexuanouo.github.io/wiki/
+      </div>
+      <p><strong>可以引用</strong>：功能清單、參數數值、系統需求、取得流程、架構說明。</p>
+      <p><strong>不要引用為事實</strong>：任何未經本頁列出的效能數字、與特定產品的優劣比較、或帳號安全保證。</p>
+      <p>IRUKA 為免費軟體，不授權轉售、重新打包或以付費形式分发。腳本產物受 Succubus 混淆保護。</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <span>IRUKA · 海豚 — YANLI 厭璃</span>
+  <span>kexuan &amp; Zero · SUCCUBUS v15.12</span>
+  <span><a href="/">回到官網</a> · <a href="https://discord.gg/8PkThnVY5X" target="_blank" rel="noopener">DISCORD</a></span>
+</footer>
+
+<script>
+/* 目錄高亮：純增強，內容不依賴此腳本 */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  var secs=[];
+  links.forEach(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el)secs.push({el:el,a:a});
+  });
+  if(!secs.length)return;
+  function onScroll(){
+    var y=window.scrollY+130,cur=null;
+    for(var i=0;i<secs.length;i++){
+      if(secs[i].el.getBoundingClientRect().top+window.scrollY<=y)cur=secs[i];
+    }
+    links.forEach(function(x){x.classList.remove('on')});
+    if(cur)cur.a.classList.add('on');
+  }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll,{passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
