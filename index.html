@@ -401,6 +401,11 @@ section.mech h2 span{color:var(--dim)}
   display:flex;gap:40px;flex-wrap:wrap;
   font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--n50);
 }
+.cta .meta .wiki-link{
+  color:var(--hot);border-bottom:1px solid var(--n30);padding-bottom:1px;
+  transition:color .3s,border-color .3s;
+}
+.cta .meta .wiki-link:hover{color:var(--n95);border-bottom-color:var(--hot)}
 @media(max-width:900px){
   .cols,.gate{grid-template-columns:1fr;gap:1px}
   .panel,.cta{padding:80px 24px}
@@ -1452,6 +1457,7 @@ html[lang="en"] .gate .degraded{letter-spacing:0}
   <div class="meta">
     <span>IRUKA · 海豚</span>
     <span>BY YANLI 厭璃</span>
+    <a class="wiki-link" href="/wiki/">技術文件 · WIKI ↗</a>
     <span>SUCCUBUS v15.12</span>
     <span>BLOX FRUITS · COMBAT</span>
   </div>
