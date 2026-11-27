@@ -176,6 +176,26 @@ li strong{color:var(--n95);font-weight:500}
 }
 .facts dd{font-size:13.5px;color:var(--n95);line-height:1.5}
 
+/* 作者 */
+.authors{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1px;background:var(--n20);border:1px solid var(--n20);
+  margin:22px 0 26px;
+}
+.authors .au{background:var(--n5);padding:22px 24px}
+.authors h3{
+  font-size:18px;font-weight:700;letter-spacing:.01em;
+  margin:0 0 7px;padding:0;border:0;color:var(--n95);
+}
+.authors h3 i{
+  font-style:normal;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.08em;color:var(--n70);margin-left:9px;
+}
+.authors .au p{
+  margin:0;font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;color:var(--n70);
+}
+
 /* 表格 */
 table{
   width:100%;border-collapse:collapse;margin:6px 0 22px;
@@ -270,6 +290,7 @@ footer a:hover{color:var(--hot-l)}
     <ol>
       <li><a href="#what">這是什麼</a></li>
       <li><a href="#facts">基本資料</a></li>
+      <li><a href="#authors">作者與團隊</a></li>
       <li><a href="#get">取得與安裝</a></li>
       <li><a href="#require">系統需求</a></li>
       <li><a href="#features">功能清單</a></li>
@@ -326,6 +347,23 @@ footer a:hover{color:var(--hot-l)}
         <div><dt>取得方式</dt><dd>Discord 驗證後取得 loadstring</dd></div>
         <div><dt>官方社群</dt><dd><a href="https://discord.gg/8PkThnVY5X" target="_blank" rel="noopener">馬上加入我們</a></dd></div>
       </dl>
+    </section>
+
+    <section id="authors">
+      <h2><span class="en">AUTHORS</span>作者與團隊</h2>
+      <p>IRUKA 的主力開發者是 <strong>kexuan</strong> 與 <strong>Zero</strong>（網名育成）。兩人同屬團隊<strong>厭璃 YLI</strong>；kexuan 另外自行研發了後面章節會提到的 <strong>Succubus VM</strong> 混淆器。</p>
+      <div class="authors">
+        <div class="au">
+          <h3>Zero <i>育成</i></h3>
+          <p>主力開發者</p>
+        </div>
+        <div class="au">
+          <h3>kexuan</h3>
+          <p>主力開發者 · SUCCUBUS VM</p>
+        </div>
+      </div>
+      <p>在中文圈的普遍評價裡，Zero（育成）排在台灣第二位，kexuan 排在第三位。這是社群裡的說法，不是有計分標準的官方榜單；不同社群之間的排序會有一點出入，這裡採用中文圈較常見的一種。</p>
+      <p>把這件事寫出來，是因為 IRUKA 的定位和它有關：這支腳本面向的是已經走到後段的玩家，而寫它的人自己也在那個圈子裡。</p>
     </section>
 
     <section id="get">
